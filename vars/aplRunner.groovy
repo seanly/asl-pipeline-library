@@ -11,14 +11,13 @@ git:
   sshUrl: git@github.com:liuyongsheng/test.git
   branch: refs/heads/master
 
-options:
-  environment:
-    APP_GROUP: sample
-    APP_NAME: sample
-    APP_ENV: test
-    APP_VERSION: '1.0.0'
-    APP_BRANCH: master
-    APP_HOSTS: 127.0.0.1
+environment:
+  APP_GROUP: sample
+  APP_NAME: sample
+  APP_ENV: test
+  APP_VERSION: '1.0.0'
+  APP_BRANCH: master
+  APP_HOSTS: 127.0.0.1
 
 pipeline:
 - name: build:
@@ -35,12 +34,20 @@ workflow:
 aplRunner(env.PIPELINE_CONFIG)
  */
 
+/** plugins:
+ * 1. pipeline-utility-steps
+ * 2. rebuild-plugins
+ */
+
 @Field gitCredentialsId = "gitlab-cibuild"
 
 def call(String yamlConfig) {
 
+    env.PIPELINE_CONFIG = "" // 清理多行文本环境变量
+
     node {
           try {
+              // dep: pipeline-utility-steps
               def yaml = readYaml text: (yamlConfig?:'')
               build(yaml)
               echo "--//INFO: Finish Build."
@@ -71,27 +78,18 @@ def build(def yaml) {
         return
     }
 
-    List stageEnvvars = []
-    def optsEnvvars = yaml.options?.environment
-    if (optsEnvvars instanceof Map) {
-        optsEnvvars.each { key, value ->
-            stageEnvvars << "${key}=${value}"
-        }
-    }
 
     // checkout code
-    withEnv(stageEnvvars) {
-      env.PIPELINE_CONFIG = "" // 清理多行文本环境变量
-      if (yaml.git?.sshUrl) {
-          gitConfig = yaml.git
-          sshCredentialsId = gitCredentialsId
-          if (gitConfig.sshCredentialsId) {
-              sshCredentialsId = gitConfig.sshCredentialsId
-          }
-          cleanWs()
-          new Git().checkoutGitRepository(".", gitConfig.sshUrl, gitConfig.branch, sshCredentialsId)
-      }
+    if (yaml.git?.sshUrl) {
+        gitConfig = yaml.git
+        sshCredentialsId = gitCredentialsId
+        if (gitConfig.sshCredentialsId) {
+            sshCredentialsId = gitConfig.sshCredentialsId
+        }
+        cleanWs()
+        new Git().checkoutGitRepository(".", gitConfig.sshUrl, gitConfig.branch, sshCredentialsId)
     }
+
 
     workflow.each {
 
@@ -106,14 +104,11 @@ def build(def yaml) {
         }
 
         stage("${stageName}") {
-            withEnv(stageEnvvars) {
-                env.PIPELINE_CONFIG = "" // 清理多行文本环境变量
-                aslPipeline(
-                        from: "jenkins",
-                        content: dumpAsMap(pipeline),
-                        properties: "run.stages=${stages}",
-                )
-            }
+            aslPipeline(
+                    from: "jenkins",
+                    content: dumpAsMap(yaml),
+                    properties: "run.stages=${stages}",
+            )
         }
     }
 }
