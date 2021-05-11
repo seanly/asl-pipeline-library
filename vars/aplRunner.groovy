@@ -20,15 +20,15 @@ environment:
   APP_HOSTS: 127.0.0.1
 
 pipeline:
-- name: build:
+- name: build
   steps:
-  - script
+  - script:
       code: |
         echo "hello, ${APP_VERSION}"
 
 workflow:
 - name: build
-  stage: build
+  stages: build
 '''
 
 aplRunner(env.CONFIG)
