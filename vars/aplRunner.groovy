@@ -38,6 +38,8 @@ aplRunner(env.CONFIG)
  * 1. pipeline-utility-steps
  * 2. rebuild-plugins
  * 3. workspace cleanup
+ * 4. BlueOcean
+ * 5. asl-plugin
  */
 
 @Field gitCredentialsId = "gitlab-cibuild"
