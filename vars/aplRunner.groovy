@@ -6,7 +6,7 @@ import org.yaml.snakeyaml.Yaml
 /*
 library 'apl@develop'
 
-env.PIPELINE_CONFIG = '''
+env.CONFIG = '''
 git:
   sshUrl: git@github.com:liuyongsheng/test.git
   branch: refs/heads/master
@@ -31,7 +31,7 @@ workflow:
   stage: build
 '''
 
-aplRunner(env.PIPELINE_CONFIG)
+aplRunner(env.CONFIG)
  */
 
 /** plugins:
@@ -43,7 +43,7 @@ aplRunner(env.PIPELINE_CONFIG)
 
 def call(String yamlConfig) {
 
-    env.PIPELINE_CONFIG = "" // 清理多行文本环境变量
+    env.CONFIG = "" // 清理多行文本环境变量
 
     node {
           try {
@@ -61,7 +61,6 @@ def call(String yamlConfig) {
 
 def build(def yaml) {
 
-    // config PIPELINE_CONFIG
     pipeline = yaml.pipeline
 
     if (pipeline == null) {
@@ -70,7 +69,6 @@ def build(def yaml) {
         return
     }
 
-    // config PIPELINE_CONFIG
     workflow = yaml.workflow
     if (workflow == null || workflow.size() == 0) {
         echo "--//ERR: workflow is not set."
@@ -104,11 +102,7 @@ def build(def yaml) {
         }
 
         stage("${stageName}") {
-            aslPipeline(
-                    from: "jenkins",
-                    content: dumpAsMap(yaml),
-                    properties: "run.stages=${stages}",
-            )
+            aslPipeline(from: "jenkins", content: dumpAsMap(yaml), properties: "run.stages=${stages}")
         }
     }
 }
