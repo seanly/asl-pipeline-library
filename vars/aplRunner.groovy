@@ -37,6 +37,7 @@ aplRunner(env.CONFIG)
 /** plugins:
  * 1. pipeline-utility-steps
  * 2. rebuild-plugins
+ * 3. workspace cleanup
  */
 
 @Field gitCredentialsId = "gitlab-cibuild"
@@ -76,7 +77,6 @@ def build(def yaml) {
         return
     }
 
-
     // checkout code
     if (yaml.git?.sshUrl) {
         gitConfig = yaml.git
@@ -87,7 +87,6 @@ def build(def yaml) {
         cleanWs()
         new Git().checkoutGitRepository(".", gitConfig.sshUrl, gitConfig.branch, sshCredentialsId)
     }
-
 
     workflow.each {
 
