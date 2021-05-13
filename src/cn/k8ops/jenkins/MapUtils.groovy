@@ -1,6 +1,5 @@
 package cn.k8ops.jenkins
 
-
 class MapUtils implements Serializable {
     static boolean isMap(object){
         return object in Map

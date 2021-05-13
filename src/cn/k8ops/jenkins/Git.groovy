@@ -1,6 +1,5 @@
 package cn.k8ops.jenkins
 
-
 /**
  *
  * Git functions

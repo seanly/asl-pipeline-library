@@ -1,4 +1,3 @@
-
 package cn.k8ops.jenkins
 
 def genSecretList(secrets) {
