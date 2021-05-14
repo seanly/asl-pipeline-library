@@ -37,7 +37,7 @@
     </pluginRepositories>
 
     <properties>
-        <jenkins.version>2.32.3</jenkins.version>
+        <jenkins.version>2.176.4</jenkins.version>
         <pipeline.version>2.5</pipeline.version>
         <cps.global.lib.version>2.6</cps.global.lib.version>
     </properties>
