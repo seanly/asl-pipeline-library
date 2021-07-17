@@ -7,6 +7,9 @@ import org.yaml.snakeyaml.Yaml
 library 'apl@develop'
 
 env.CONFIG = '''
+
+agent: docker
+
 git:
   sshUrl: git@github.com:liuyongsheng/test.git
   branch: refs/heads/master
@@ -48,10 +51,16 @@ def call(String yamlConfig) {
 
     env.CONFIG = "" // 清理多行文本环境变量
 
-    node {
+    // dep: pipeline-utility-steps
+    def yaml = readYaml text: (yamlConfig?:'')
+
+    agent = yaml.agent
+    if (agent == null || agent.size() == 0) {
+        agent = 'docker'
+    }
+
+    node (agent){
           try {
-              // dep: pipeline-utility-steps
-              def yaml = readYaml text: (yamlConfig?:'')
               build(yaml)
               echo "--//INFO: Finish Build."
           } catch (err) {
