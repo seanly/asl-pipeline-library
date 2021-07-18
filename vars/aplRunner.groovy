@@ -112,7 +112,7 @@ def build(def yaml) {
         }
 
         stage("${stageName}") {
-            aslPipeline(from: "jenkins", content: dumpAsMap(yaml), properties: "run.stages=${stages}")
+            aslPipeline(from: "jenkins", content: dumpAsMap(yaml), environs: "RUN_STAGES=${stages}")
         }
     }
 }
